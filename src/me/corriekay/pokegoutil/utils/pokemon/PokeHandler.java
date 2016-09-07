@@ -26,7 +26,7 @@ public class PokeHandler {
     private ArrayList<Pokemon> mons;
 
     public PokeHandler(Pokemon pokemon) {
-        this(new Pokemon[] { pokemon });
+        this(new Pokemon[]{pokemon});
     }
 
     public PokeHandler(Pokemon[] pokemon) {
@@ -56,9 +56,7 @@ public class PokeHandler {
 
         if (pokeNick.equals(pokemon.getNickname())) {
             // Why renaming to the same nickname?
-            return NicknamePokemonResponse.Result.UNSET; // We need to use UNSET here. No
-                                                         // chance to
-                                                         // extend the enum
+            return NicknamePokemonResponse.Result.UNSET; // We need to use UNSET here. No chance to extend the enum
         }
 
         // Actually renaming the Pokémon with the calculated nickname
@@ -126,8 +124,8 @@ public class PokeHandler {
      * @return A <c>LinkedHashMap</c> with each Pokémon as key and the result as
      * value.
      */
-    public LinkedHashMap<Pokemon, NicknamePokemonResponse.Result> bulkRenameWithPattern(String pattern,
-            BiConsumer<NicknamePokemonResponse.Result, Pokemon> perPokeCallback) {
+    public LinkedHashMap<Pokemon, NicknamePokemonResponse.Result> bulkRenameWithPattern(final String pattern,
+                                                                                        final BiConsumer<NicknamePokemonResponse.Result, Pokemon> perPokeCallback) {
         LinkedHashMap<Pokemon, NicknamePokemonResponse.Result> results = new LinkedHashMap<>();
 
         mons.forEach(p -> {
@@ -221,8 +219,7 @@ public class PokeHandler {
                                         m2.getBaseStamina() + iv_stamina, level);
                                 return comb1 - comb2;
                             };
-                            highestFamilyId = PokemonId
-                                    .forNumber(Collections.max(Arrays.asList(vap, fla, jol), cMeta).getNumber());
+                            highestFamilyId = PokemonId.forNumber(Collections.max(Arrays.asList(vap, fla, jol), cMeta).getNumber());
                         }
                     } else {
                         // This is one of the eeveelutions, so PokemonMetaRegistry.getHightestForFamily() returns Eevee.
@@ -355,32 +352,20 @@ public class PokeHandler {
                 return String.valueOf(PokemonCpUtils.getMaxCp(attack, defense, stamina));
             }
         },
-        MOVE_TYPE_1("Move 1 type (Fire)") {
+        MOVE_TYPE_1("Move 1 abbreviated (Ghost = Gh)") {
             @Override
             public String get(Pokemon p) {
-                String type = PokemonMoveMetaRegistry.getMeta(p.getMove1()).getType().toString();
-                return StringUtils.capitalize(type.toLowerCase());
+                final String type = PokemonMoveMetaRegistry.getMeta(p.getMove1()).getType().toString();
+                final boolean hasStab = type.equals(p.getMeta().getType1().toString()) || type.equals(p.getMeta().getType2().toString());
+                return (hasStab) ? abbreviateType(type).toUpperCase() : abbreviateType(type).toLowerCase();
             }
         },
-        MOVE_TYPE_2("Move 2 type (Fire)") {
+        MOVE_TYPE_2("Move 2 abbreviated (Ghost = Gh)") {
             @Override
             public String get(Pokemon p) {
-                String type = PokemonMoveMetaRegistry.getMeta(p.getMove2()).getType().toString();
-                return StringUtils.capitalize(type.toLowerCase());
-            }
-        },
-        MOVE_TYPE_1_SHORT("Move 1 abbreviated (Ghost = Gh)") {
-            @Override
-            public String get(Pokemon p) {
-                String type = PokemonMoveMetaRegistry.getMeta(p.getMove1()).getType().toString();
-                return abbreviateType(type);
-            }
-        },
-        MOVE_TYPE_2_SHORT("Move 2 abbreviated (Ghost = Gh)") {
-            @Override
-            public String get(Pokemon p) {
-                String type = PokemonMoveMetaRegistry.getMeta(p.getMove2()).getType().toString();
-                return abbreviateType(type);
+                final String type = PokemonMoveMetaRegistry.getMeta(p.getMove1()).getType().toString();
+                final boolean hasStab = type.equals(p.getMeta().getType1().toString()) || type.equals(p.getMeta().getType2().toString());
+                return hasStab ? abbreviateType(type).toUpperCase() : abbreviateType(type).toLowerCase();
             }
         },
         MOVE_TYPE_1_UNI("Move 1 abbreviated (Eletric = ⚡)") {
@@ -457,10 +442,9 @@ public class PokeHandler {
         };
 
         private static String abbreviateType(String type) {
-            if (type.equalsIgnoreCase("none")) {
+            if ("none".equalsIgnoreCase(type)) {
                 return "__";
-            }
-            else if (type.equalsIgnoreCase("fighting") || type.equalsIgnoreCase("ground")) {
+            } else if ("fighting".equalsIgnoreCase(type) || "ground".equalsIgnoreCase(type)) {
                 // "Gr" is Grass, so we make Ground "Gd". "Fi" is Fire, so we make Fighting "Fg"
                 return type.substring(0, 1).toUpperCase() + type.substring(type.length() - 1).toLowerCase();
             } else {
